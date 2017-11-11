@@ -28,7 +28,7 @@ import javax.swing.JScrollPane;
 
 public class CalculatorGUI implements MouseListener{
 
-	private final String[] characterList = {"(",")","%","*","7","8","9","/", "4","5","6","+","1","2","3","-","CE","0",".","="};
+	private final String[] characterList = {"(",")","%","*","7","8","9","/", "4","5","6","+","1","2","3","-","\u232B","0",".","="};
 	private final boolean[] characterBold = {false, false, false, false, 
 											true, true, true, false, 
 											true, true, true, false, 
@@ -138,7 +138,7 @@ public class CalculatorGUI implements MouseListener{
 	public void mouseReleased(MouseEvent e) {
 		for(int i = 0; i < 20; i++) {
 			if(e.getSource().equals(buttonList.get(i))) {
-				if(characterList[i].equals("CE")) {
+				if(characterList[i].equals("\u232B")) {
 					if(inputPanel.getText().length() != 1) {
 						inputPanel.setText(inputPanel.getText().substring(0, inputPanel.getText().length()-1));
 					}else {	

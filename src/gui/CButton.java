@@ -20,7 +20,7 @@ public class CButton extends JButton{
 	
 	public CButton(String text, boolean isBold) {
 		super(text);
-		setFont(new Font("Arial", isBold ? Font.BOLD : Font.PLAIN,20));
+		setFont(new Font("Segoe UI Symbol", isBold ? Font.BOLD : Font.PLAIN,20));
 		setBackground(Color.BLACK);//import java.awt.Color;
 		setForeground(Color.WHITE);
 		setFocusPainted(false);
