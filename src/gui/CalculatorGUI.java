@@ -28,12 +28,14 @@ import javax.swing.JScrollPane;
 
 public class CalculatorGUI implements MouseListener{
 
-	private final String[] characterList = {"(",")","%","*","7","8","9","/", "4","5","6","+","1","2","3","-","\u232B","0",".","="};
-	private final boolean[] characterBold = {false, false, false, false, 
-											true, true, true, false, 
-											true, true, true, false, 
-											true, true, true, false,
-											false, true, false, false};
+	//\u232B
+	
+	private final String[] characterList = {"\u232B",  "CE", "(",")","%","7","8","9","*","/", "4","5","6","+","−","1","2","3","-","=","0","."};
+	private final boolean[] characterBold = {false, false, false, false, false,
+											true, true, true, false, false, 
+											true, true, true, false, false,
+											true, true, true, false, false,
+											true, false};
 	
 	private ArrayList<CButton> buttonList;
 	private int openPar;
@@ -100,8 +102,12 @@ public class CalculatorGUI implements MouseListener{
 		horScrBar = scrollPane.getHorizontalScrollBar();
 		horScrBar.setValue(horScrBar.getMaximum());
 		
-		for(int i = 0; i < 20; i++) {
-			addButton(characterList[i], characterBold[i]);
+		for(int i = 0; i < characterList.length; i++) {
+			if(characterList[i] == "-") {
+				addButton("( - )", characterBold[i]);
+			}else {
+				addButton(characterList[i], characterBold[i]);
+			}
 		}
 		
 		frame.getContentPane().add(container);
@@ -139,15 +145,19 @@ public class CalculatorGUI implements MouseListener{
 		for(int i = 0; i < 20; i++) {
 			if(e.getSource().equals(buttonList.get(i))) {
 				if(characterList[i].equals("\u232B")) {
+					System.out.println("HERE");
+					System.out.println(inputPanel.getText().length());
 					if(inputPanel.getText().length() != 1) {
 						inputPanel.setText(inputPanel.getText().substring(0, inputPanel.getText().length()-1));
 					}else {	
 						inputPanel.setText("0");
 					}
 					
+				}else if(characterList[i].equals("CE")) {
+					inputPanel.setText("0");
 				}else if(characterList[i].equals("(")) {
 					char prevChar = inputPanel.getText().charAt(inputPanel.getText().length()-1);
-					if((prevChar == '+' || prevChar == '-' || prevChar == '*' || prevChar == '/' || prevChar == '%' || prevChar == '(')) {
+					if((prevChar == '+' || prevChar == '−' || prevChar == '*' || prevChar == '/' || prevChar == '%' || prevChar == '(')) {
 						inputPanel.setText(inputPanel.getText() + characterList[i]);
 						openPar++;
 					}else if(inputPanel.getText().length() == 1 && inputPanel.getText().charAt(0) == '0') {
@@ -162,15 +172,15 @@ public class CalculatorGUI implements MouseListener{
 							System.out.println(inputPanel.getText() + "0" + characterList[i]);
 							inputPanel.setText(inputPanel.getText() + "0" + characterList[i]);
 							openPar--;
-						}else if(!(prevChar == '+' || prevChar == '-' || prevChar == '*' || prevChar == '/' || prevChar == '%')) {
+						}else if(!(prevChar == '+' || prevChar == '−' || prevChar == '*' || prevChar == '/' || prevChar == '%')) {
 							inputPanel.setText(inputPanel.getText() + characterList[i]);
 							openPar--;
 						}
 					}
 					
-				}else if(characterList[i].equals("+") || characterList[i].equals("-") || characterList[i].equals("*") || characterList[i].equals("/") || characterList[i].equals("%")){
+				}else if(characterList[i].equals("+") || characterList[i].equals("−") || characterList[i].equals("*") || characterList[i].equals("/") || characterList[i].equals("%")){
 					char prevChar = inputPanel.getText().charAt(inputPanel.getText().length()-1);
-					if(prevChar == '+' || prevChar == '-' || prevChar == '*' || prevChar == '/' || prevChar == '%') {						
+					if(prevChar == '+' || prevChar == '−' || prevChar == '*' || prevChar == '/' || prevChar == '%') {						
 						inputPanel.setText(inputPanel.getText().substring(0, inputPanel.getText().length()-1) + characterList[i]);
 					}else {
 						inputPanel.setText(inputPanel.getText() + characterList[i]);
@@ -180,7 +190,7 @@ public class CalculatorGUI implements MouseListener{
 					String input = inputPanel.getText().trim();
 					System.out.println("ENTERING THE TREE");
 					System.out.println("MY INPUT WILL BE: \"" + input + "\"");
-					inputPanel.setText(new CalculatorVisitor().solve(input).toString());
+					inputPanel.setText(new CalculatorVisitor().solve(input.replaceAll("−", "-")).toString());
 					
 				}else if(characterList[i].equals(".")) {
 					if(inputPanel.getText().lastIndexOf(".") == -1) {
@@ -191,7 +201,7 @@ public class CalculatorGUI implements MouseListener{
 						for(int j = toCheck.length()-1; j > 0; j--) {
 							System.out.print(inputPanel.getText().charAt(j));
 							if(toCheck.charAt(j) == '+' 
-							|| toCheck.charAt(j) == '-'
+							|| toCheck.charAt(j) == '−'
 							|| toCheck.charAt(j) == '*'
 							|| toCheck.charAt(j) == '/'
 							|| toCheck.charAt(j) == '%') {
@@ -211,12 +221,24 @@ public class CalculatorGUI implements MouseListener{
 						}
 					}
 					
+				}else if(characterList[i].equals("-")){
+					System.out.println("FOUND A -");
+					char prevprevChar = inputPanel.getText().length() > 1 ? inputPanel.getText().charAt(inputPanel.getText().length()-2) : ' '; 
+					char prevChar = inputPanel.getText().charAt(inputPanel.getText().length()-1);
+					String prev = prevprevChar + "" +  prevChar;
+					
+					if((prevprevChar == '+' || prevprevChar == '−' || prevprevChar == '*' || prevprevChar == '/' || prevprevChar == '%' || prevprevChar == ' ') && prevChar == '0') {
+						inputPanel.setText(inputPanel.getText().substring(0, inputPanel.getText().length()-1) + characterList[i]);	
+					}else if(prevChar == '+' || prevChar == '−' || prevChar == '*' || prevChar == '/' || prevChar == '%' || prevChar == ' ' || prevChar == '(') {
+						inputPanel.setText(inputPanel.getText().substring(0, inputPanel.getText().length()) + characterList[i]);
+					}
+					
 				}else {
 					char prevprevChar = inputPanel.getText().length() > 1 ? inputPanel.getText().charAt(inputPanel.getText().length()-2) : ' '; 
 					char prevChar = inputPanel.getText().charAt(inputPanel.getText().length()-1);
 					String prev = prevprevChar + "" +  prevChar;
 					
-					if((prevprevChar == '+' || prevprevChar == '-' || prevprevChar == '*' || prevprevChar == '/' || prevprevChar == '%' || prevprevChar == ' ') && prevChar == '0') {
+					if((prevprevChar == '+' || prevprevChar == '−' || prevprevChar == '*' || prevprevChar == '/' || prevprevChar == '%' || prevprevChar == ' ') && prevChar == '0') {
 						inputPanel.setText(inputPanel.getText().substring(0, inputPanel.getText().length()-1) + characterList[i]);	
 					}else {
 						inputPanel.setText(inputPanel.getText() + characterList[i]);
