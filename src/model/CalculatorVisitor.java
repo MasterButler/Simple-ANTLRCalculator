@@ -37,6 +37,10 @@ public class CalculatorVisitor extends CalcBaseVisitor<Float>{
         
         tree = parser.code();
         
+        TreeViewer viewr = new TreeViewer(Arrays.asList(parser.getRuleNames()), tree);
+        viewr.setScale(1.5);
+        viewr.open();
+        
 		return visit(tree);
 	}
 
