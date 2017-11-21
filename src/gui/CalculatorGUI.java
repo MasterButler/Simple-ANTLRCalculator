@@ -146,9 +146,11 @@ public class CalculatorGUI implements MouseListener{
 		for(int i = 0; i < characterList.length; i++) {
 			if(e.getSource().equals(buttonList.get(i))) {
 				if(inputPanel.getText().contains("Infinity")
-				    || inputPanel.getText().contains(WRONG_INPUT)) {
+				    || ( SyntaxErrorCollector.getInstance().inputHasErrors() == true 
+				         && inputPanel.getText().contains(SyntaxErrorCollector.getInstance().inputShowErrors())) ) {
 					if(characterList[i].equals("CE")) {
 						inputPanel.setText("0");
+						openPar = 0;
 					}	
 				}else {
 					if(characterList[i].equals("CE")) {
@@ -205,7 +207,7 @@ public class CalculatorGUI implements MouseListener{
 						Float output = cv.solve(input);
 						
 						if(SyntaxErrorCollector.getInstance().inputHasErrors()) {
-							inputPanel.setText(WRONG_INPUT);
+							inputPanel.setText(SyntaxErrorCollector.getInstance().inputShowErrors());
 						}else {
 							inputPanel.setText(output.toString());
 						}
