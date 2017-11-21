@@ -9,6 +9,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.DefaultErrorStrategy;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import collector.SyntaxErrorCollector;
+import listener.JavaBaseErrorListener;
 import model.CalcParser.CodeContext;
 import model.CalcParser.OperationExprContext;
 import model.CalcParser.ParExprContext;
@@ -24,6 +26,7 @@ public class CalculatorVisitor extends CalcBaseVisitor<Float>{
 	private ParseTree tree;
 	
 	public Float solve(String expression) {
+		SyntaxErrorCollector.getInstance().reset();
 		Float output = Float.valueOf(0);
 		
 		lexer = new CalcLexer(CharStreams.fromString(expression));
@@ -34,6 +37,7 @@ public class CalculatorVisitor extends CalcBaseVisitor<Float>{
         
         parser = new CalcParser(tokens);
         parser.setErrorHandler(defaultStrat);
+        parser.addErrorListener(new JavaBaseErrorListener());
         
         tree = parser.code();
         
@@ -51,7 +55,9 @@ public class CalculatorVisitor extends CalcBaseVisitor<Float>{
 	
 	@Override
 	public Float visitOperationExpr(OperationExprContext ctx) {
-		if(ctx.op != null) {
+		if(ctx.op.getText().length() > 0 
+			&& ctx.left.getText().length() > 0
+			&& ctx.right.getText().length() > 0) {
 			System.out.println();
 			System.out.println();
 			System.out.println("MY LEFT	 IS:" + ctx.left.getText() );
@@ -76,7 +82,15 @@ public class CalculatorVisitor extends CalcBaseVisitor<Float>{
 	
 	@Override
 	public Float visitVal(ValContext ctx) {
-		return Float.valueOf(ctx.getText());
+		if(ctx.getText().equals("-")) {
+			return 0F;
+		}else {
+			try {
+				return Float.valueOf(ctx.getText());			
+			}catch(Exception e) {
+				return 0F;
+			}
+		}
 	}
 	
 	@Override

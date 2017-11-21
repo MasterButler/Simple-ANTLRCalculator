@@ -21,6 +21,7 @@ import javax.swing.border.EmptyBorder;
 
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 
+import collector.SyntaxErrorCollector;
 import model.CalculatorUtil;
 import model.CalculatorVisitor;
 
@@ -29,7 +30,7 @@ import javax.swing.JScrollPane;
 public class CalculatorGUI implements MouseListener{
 
 	//\u232B
-	
+	public static final String WRONG_INPUT = "Wrong Input!";
 	private final String[] characterList = {"\u232B",  "CE", "(",")","%","7","8","9","*","/", "4","5","6","+","−","1","2","3","-","=","0","."};
 	private final boolean[] characterBold = {false, false, false, false, false,
 											true, true, true, false, false, 
@@ -144,7 +145,8 @@ public class CalculatorGUI implements MouseListener{
 	public void mouseReleased(MouseEvent e) {
 		for(int i = 0; i < characterList.length; i++) {
 			if(e.getSource().equals(buttonList.get(i))) {
-				if(inputPanel.getText().contains("Infinity")) {
+				if(inputPanel.getText().contains("Infinity")
+				    || inputPanel.getText().contains(WRONG_INPUT)) {
 					if(characterList[i].equals("CE")) {
 						inputPanel.setText("0");
 					}	
@@ -188,14 +190,26 @@ public class CalculatorGUI implements MouseListener{
 						if(prevChar == '+' || prevChar == '−' || prevChar == '*' || prevChar == '/' || prevChar == '%') {						
 							inputPanel.setText(inputPanel.getText().substring(0, inputPanel.getText().length()-1) + characterList[i]);
 						}else {
-							inputPanel.setText(inputPanel.getText() + characterList[i]);
+							if(prevChar >= '0' && prevChar <= '9') {
+								inputPanel.setText(inputPanel.getText() + characterList[i]);
+							}
 						}
 						
 					}else if(characterList[i].equals("=")) {
 						String input = inputPanel.getText().trim();
 						System.out.println("ENTERING THE TREE");
 						System.out.println("MY INPUT WILL BE: \"" + input + "\"");
-						inputPanel.setText(new CalculatorVisitor().solve(input.replaceAll("−", "-")).toString());
+						CalculatorVisitor cv = new CalculatorVisitor();
+						
+						input = input.replaceAll("−", "-");
+						Float output = cv.solve(input);
+						
+						if(SyntaxErrorCollector.getInstance().inputHasErrors()) {
+							inputPanel.setText(WRONG_INPUT);
+						}else {
+							inputPanel.setText(output.toString());
+						}
+						
 						
 					}else if(characterList[i].equals(".")) {
 						if(inputPanel.getText().lastIndexOf(".") == -1) {
